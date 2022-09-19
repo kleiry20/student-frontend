@@ -40,30 +40,37 @@ const Classes = () => {
 
   // delete record and then update table
   const onDelete = (id) => {
-    axios.delete(`http://127.0.0.1:8000/standards/${id}`).then(() => {
-      handleDelClose();
-    });
+    axios
+      .delete(`https://gloify-student-backend.herokuapp.com/standards/${id}`)
+      .then(() => {
+        handleDelClose();
+      });
   };
   const getData = () => {
-    axios.get(`http://127.0.0.1:8000/standards/`).then((getData) => {
-      setStandards(getData.data);
-    });
+    axios
+      .get(`https://gloify-student-backend.herokuapp.com/standards/`)
+      .then((getData) => {
+        setStandards(getData.data);
+      });
   };
 
   // create api call (post request)
   const postData = () => {
     if (record_ID) {
       axios
-        .put(`http://127.0.0.1:8000/standards/${record_ID}`, {
-          stdID,
-          stdName,
-        })
+        .put(
+          `https://gloify-student-backend.herokuapp.com/standards/${record_ID}`,
+          {
+            stdID,
+            stdName,
+          }
+        )
         .then((response) => {
           standards.push(response.data);
         });
     } else {
       axios
-        .post(`http://127.0.0.1:8000/standards/`, {
+        .post(`https://gloify-student-backend.herokuapp.com/standards/`, {
           stdID,
           stdName,
         })
@@ -76,16 +83,18 @@ const Classes = () => {
   // fetching standard details
   useEffect(() => {
     if (!show) {
-      axios.get(`http://127.0.0.1:8000/standards/`).then((response) => {
-        setStandards(response.data);
-      });
+      axios
+        .get(`https://gloify-student-backend.herokuapp.com/standards/`)
+        .then((response) => {
+          setStandards(response.data);
+        });
     }
   }, [show, delshow]);
 
   // fetching Student Class Map dtails
   // useEffect(() => {
   //   axios
-  //     .get(`http://127.0.0.1:8000/maps/${studentItem.id}`)
+  //     .get(`https://gloify-student-backend.herokuapp.com/maps/${studentItem.id}`)
   //     .then((response) => {
   //       setMaps(response.data);
   //     });
