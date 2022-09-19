@@ -54,8 +54,6 @@ const Students = () => {
     });
   };
 
-  // update api call (put request)
-
   // create api call (post request)
   const postData = () => {
     if (record_ID) {
@@ -196,7 +194,7 @@ const Students = () => {
                       }}
                     >
                       View
-                    </Button>
+                    </Button>{" "}
                     <Button
                       variant="success"
                       size="sm"
@@ -204,8 +202,8 @@ const Students = () => {
                     >
                       Update
                     </Button>{" "}
-                    <Button variant="danger" onClick={handleDelShow}>
-                      Wanna delete?
+                    <Button variant="danger" size="sm" onClick={handleDelShow}>
+                      Delete
                     </Button>{" "}
                     <Modal
                       show={delshow}
@@ -238,7 +236,7 @@ const Students = () => {
           </tbody>
           <Modal show={newshow} onHide={newhandleClose}>
             <Modal.Header closeButton>
-              <Modal.Title>Modal heading</Modal.Title>
+              <Modal.Title>Detailed View</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <Table striped bordered hover>
@@ -266,6 +264,7 @@ const Students = () => {
                   <tr>
                     <th>Standard ID</th>
                     <th>Student ID</th>
+                    <th>Standard Name</th>
                     <th>Rank</th>
                     <th>Marks</th>
                   </tr>
@@ -276,6 +275,7 @@ const Students = () => {
                       <tr>
                         <td>{studentMap.stdID}</td>
                         <td>{studentMap.studID}</td>
+                        <td>{studentMap.standard_name}</td>
                         <td>{studentMap.rank}</td>
                         <td>{studentMap.marks}</td>
                       </tr>

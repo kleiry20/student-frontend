@@ -7,66 +7,32 @@ import Modal from "react-bootstrap/Modal";
 import Header from "./Header";
 import axios from "axios";
 
-function StandardViewModal(props) {
-  const [standards, setStandards] = useState([]);
-  return (
-    <Modal
-      {...props}
-      size="lg"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          Standard Details
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Table striped bordered hover>
-          <thead>
-            <tr>
-              <th>Serial Number</th>
-              <th>Standard ID</th>
-              <th>Standard Name</th>
-            </tr>
-          </thead>
-          <tbody>
-            {standards.map((standard) => {
-              return (
-                <tr>
-                  <td>{standard.id}</td>
-                  <td>{standard.stdID}</td>
-                  <td>{standard.stdName}</td>
-                  <td></td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </Table>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button onClick={props.onHide}>Close</Button>
-      </Modal.Footer>
-    </Modal>
-  );
-}
-
 const Classes = () => {
   const [record_ID, setRecordID] = useState("");
+  const [studentItem, setStudentItem] = useState("");
 
   const [show, setShow] = useState(false);
-  const [modalShow, setModalShow] = React.useState(false);
 
+  // Standard get request parameters
   const [stdID, setstdID] = useState("");
   const [stdName, setstdName] = useState("");
   const [standards, setStandards] = useState([]);
 
+  // Student Class Map get req params
+  // const [maps, setMaps] = useState([]);
+
+  // delete records params
+  const [delshow, setDelShow] = useState(false);
+  const handleDelClose = () => setDelShow(false);
+  const handleDelShow = () => setDelShow(true);
+  //
+
   const handleClose = () => setShow(false);
   const handleShow = (record) => {
+    // console.log("hiiiiiiiiii");
     setRecordID(record.id);
     setstdID(record.stdID);
     setstdName(record.stdName);
-
     setTimeout(() => {
       setShow(true);
     }, 60);
@@ -75,7 +41,7 @@ const Classes = () => {
   // delete record and then update table
   const onDelete = (id) => {
     axios.delete(`http://127.0.0.1:8000/standards/${id}`).then(() => {
-      getData();
+      handleDelClose();
     });
   };
   const getData = () => {
@@ -84,6 +50,7 @@ const Classes = () => {
     });
   };
 
+  // create api call (post request)
   const postData = () => {
     if (record_ID) {
       axios
@@ -106,13 +73,23 @@ const Classes = () => {
     }
     handleClose();
   };
+  // fetching standard details
   useEffect(() => {
     if (!show) {
       axios.get(`http://127.0.0.1:8000/standards/`).then((response) => {
         setStandards(response.data);
       });
     }
-  }, [show]);
+  }, [show, delshow]);
+
+  // fetching Student Class Map dtails
+  // useEffect(() => {
+  //   axios
+  //     .get(`http://127.0.0.1:8000/maps/${studentItem.id}`)
+  //     .then((response) => {
+  //       setMaps(response.data);
+  //     });
+  // }, [studentItem.id]);
 
   return (
     <>
@@ -179,30 +156,39 @@ const Classes = () => {
                   <td>{standard.stdName}</td>
                   <td>
                     <Button
-                      variant="primary"
-                      size="sm"
-                      onClick={() => setModalShow(true)}
-                    >
-                      View
-                    </Button>
-                    <StandardViewModal
-                      show={modalShow}
-                      onHide={() => setModalShow(false)}
-                    />{" "}
-                    <Button
                       variant="success"
                       size="sm"
                       onClick={() => handleShow(standard)}
                     >
                       Update
                     </Button>{" "}
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={() => onDelete(standard.id)}
-                    >
+                    <Button variant="danger" size="sm" onClick={handleDelShow}>
                       Delete
                     </Button>{" "}
+                    <Modal
+                      show={delshow}
+                      onHide={handleDelClose}
+                      backdrop="static"
+                      keyboard={false}
+                    >
+                      <Modal.Header closeButton>
+                        <Modal.Title>Alert!! Please review</Modal.Title>
+                      </Modal.Header>
+                      <Modal.Body>
+                        Are you sure to delete this record?
+                      </Modal.Body>
+                      <Modal.Footer>
+                        <Button variant="secondary" onClick={handleDelClose}>
+                          Cancel
+                        </Button>
+                        <Button
+                          variant="primary"
+                          onClick={() => onDelete(standard.id)}
+                        >
+                          Yes
+                        </Button>
+                      </Modal.Footer>
+                    </Modal>
                   </td>
                 </tr>
               );
