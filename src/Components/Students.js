@@ -6,69 +6,26 @@ import Modal from "react-bootstrap/Modal";
 
 import Header from "./Header";
 import axios from "axios";
-// import StudentViewModal from "./StudentViewModal";
-
-function StudentViewModal(props) {
-  const [students, setStudents] = useState([]);
-
-  return (
-    <Modal
-      {...props}
-      size="lg"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          Student Details
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Table striped bordered hover>
-          <thead>
-            <tr>
-              <th>Serial Number</th>
-              <th>First Name</th>
-              <th>Last Name</th>
-              <th>Roll Number</th>
-              <th>Email Id</th>
-            </tr>
-          </thead>
-          <tbody>
-            {students.map((student) => {
-              return (
-                <tr>
-                  <td>{student.id}</td>
-                  <td>{student.fname}</td>
-                  <td>{student.lname}</td>
-                  <td>{student.studID}</td>
-                  <td>{student.email}</td>
-                  <td></td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </Table>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button onClick={props.onHide}>Close</Button>
-      </Modal.Footer>
-    </Modal>
-  );
-}
 
 const Students = () => {
   const [record_ID, setRecordID] = useState("");
+  const [studentItem, setStudentItem] = useState("");
 
   const [show, setShow] = useState(false);
-  // get request parameters
+  // Student get request parameters
   const [fname, setfname] = useState("");
   const [lname, setlname] = useState("");
   const [studID, setstudID] = useState("");
   const [email, setEmail] = useState("");
   const [students, setStudents] = useState([]);
-  // StudentViewModal
-  const [modalShow, setModalShow] = React.useState(false);
+
+  // Student Class Map get req params
+  const [maps, setMaps] = useState([]);
+
+  // New modal
+  const [newshow, setNewShow] = useState(false);
+  const newhandleClose = () => setNewShow(false);
+  const newhandleShow = () => setNewShow(true);
 
   // delete records params
   const [delshow, setDelShow] = useState(false);
@@ -93,12 +50,7 @@ const Students = () => {
   // delete record and then update table
   const onDelete = (id) => {
     axios.delete(`http://127.0.0.1:8000/students/${id}`).then(() => {
-      getData();
-    });
-  };
-  const getData = () => {
-    axios.get(`http://127.0.0.1:8000/students/`).then((getData) => {
-      setStudents(getData.data);
+      handleDelClose();
     });
   };
 
@@ -131,14 +83,23 @@ const Students = () => {
     }
     handleClose();
   };
-
+  // fetching student details
   useEffect(() => {
     if (!show) {
       axios.get(`http://127.0.0.1:8000/students/`).then((response) => {
         setStudents(response.data);
       });
     }
-  }, [show]);
+  }, [show, delshow]);
+
+  // fetching Student Class Map dtails
+  useEffect(() => {
+    axios
+      .get(`http://127.0.0.1:8000/maps/${studentItem.id}`)
+      .then((response) => {
+        setMaps(response.data);
+      });
+  }, [studentItem.id]);
 
   return (
     <>
@@ -229,14 +190,13 @@ const Students = () => {
                     <Button
                       variant="primary"
                       size="sm"
-                      onClick={() => setModalShow(true)}
+                      onClick={() => {
+                        setStudentItem(student);
+                        newhandleShow();
+                      }}
                     >
                       View
                     </Button>
-                    <StudentViewModal
-                      show={modalShow}
-                      onHide={() => setModalShow(false)}
-                    />{" "}
                     <Button
                       variant="success"
                       size="sm"
@@ -247,13 +207,6 @@ const Students = () => {
                     <Button variant="danger" onClick={handleDelShow}>
                       Wanna delete?
                     </Button>{" "}
-                    {/* <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={() => onDelete(student.id)}
-                    >
-                      Delete
-                    </Button>{" "} */}
                     <Modal
                       show={delshow}
                       onHide={handleDelClose}
@@ -283,6 +236,55 @@ const Students = () => {
               );
             })}
           </tbody>
+          <Modal show={newshow} onHide={newhandleClose}>
+            <Modal.Header closeButton>
+              <Modal.Title>Modal heading</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Table striped bordered hover>
+                <thead>
+                  <tr>
+                    <th>Serial Number</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Roll Number</th>
+                    <th>Email Id</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{studentItem.id}</td>
+                    <td>{studentItem.fname}</td>
+                    <td>{studentItem.lname}</td>
+                    <td>{studentItem.studID}</td>
+                    <td>{studentItem.email}</td>
+                  </tr>
+                </tbody>
+              </Table>
+              <Table striped bordered hover>
+                <thead>
+                  <tr>
+                    <th>Standard ID</th>
+                    <th>Student ID</th>
+                    <th>Rank</th>
+                    <th>Marks</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {maps.map((studentMap) => {
+                    return (
+                      <tr>
+                        <td>{studentMap.stdID}</td>
+                        <td>{studentMap.studID}</td>
+                        <td>{studentMap.rank}</td>
+                        <td>{studentMap.marks}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </Table>
+            </Modal.Body>
+          </Modal>
         </Table>
       </div>
     </>
@@ -290,5 +292,3 @@ const Students = () => {
 };
 
 export default Students;
-
-// alert("Delete this record?")
