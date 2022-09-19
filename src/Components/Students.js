@@ -70,6 +70,12 @@ const Students = () => {
   // StudentViewModal
   const [modalShow, setModalShow] = React.useState(false);
 
+  // delete records params
+  const [delshow, setDelShow] = useState(false);
+  const handleDelClose = () => setDelShow(false);
+  const handleDelShow = () => setDelShow(true);
+  //
+
   const handleClose = () => setShow(false);
   const handleShow = (record) => {
     console.log(record.fname);
@@ -238,13 +244,40 @@ const Students = () => {
                     >
                       Update
                     </Button>{" "}
-                    <Button
+                    <Button variant="danger" onClick={handleDelShow}>
+                      Wanna delete?
+                    </Button>{" "}
+                    {/* <Button
                       variant="danger"
                       size="sm"
                       onClick={() => onDelete(student.id)}
                     >
                       Delete
-                    </Button>{" "}
+                    </Button>{" "} */}
+                    <Modal
+                      show={delshow}
+                      onHide={handleDelClose}
+                      backdrop="static"
+                      keyboard={false}
+                    >
+                      <Modal.Header closeButton>
+                        <Modal.Title>Alert!! Please review</Modal.Title>
+                      </Modal.Header>
+                      <Modal.Body>
+                        Are you sure to delete this record?
+                      </Modal.Body>
+                      <Modal.Footer>
+                        <Button variant="secondary" onClick={handleDelClose}>
+                          Cancel
+                        </Button>
+                        <Button
+                          variant="primary"
+                          onClick={() => onDelete(student.id)}
+                        >
+                          Yes
+                        </Button>
+                      </Modal.Footer>
+                    </Modal>
                   </td>
                 </tr>
               );

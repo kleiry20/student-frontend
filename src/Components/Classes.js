@@ -52,34 +52,66 @@ function StandardViewModal(props) {
 }
 
 const Classes = () => {
+  const [record_ID, setRecordID] = useState("");
+
   const [show, setShow] = useState(false);
   const [modalShow, setModalShow] = React.useState(false);
 
   const [stdID, setstdID] = useState("");
   const [stdName, setstdName] = useState("");
-
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-
   const [standards, setStandards] = useState([]);
 
-  useEffect(() => {}, []);
+  const handleClose = () => setShow(false);
+  const handleShow = (record) => {
+    setRecordID(record.id);
+    setstdID(record.stdID);
+    setstdName(record.stdName);
+
+    setTimeout(() => {
+      setShow(true);
+    }, 60);
+  };
+
+  // delete record and then update table
+  const onDelete = (id) => {
+    axios.delete(`http://127.0.0.1:8000/standards/${id}`).then(() => {
+      getData();
+    });
+  };
+  const getData = () => {
+    axios.get(`http://127.0.0.1:8000/standards/`).then((getData) => {
+      setStandards(getData.data);
+    });
+  };
 
   const postData = () => {
-    axios
-      .post(`http://127.0.0.1:8000/standards/`, {
-        stdID,
-        stdName,
-      })
-      .then((response) => {
-        standards.push(response.data);
-      });
+    if (record_ID) {
+      axios
+        .put(`http://127.0.0.1:8000/standards/${record_ID}`, {
+          stdID,
+          stdName,
+        })
+        .then((response) => {
+          standards.push(response.data);
+        });
+    } else {
+      axios
+        .post(`http://127.0.0.1:8000/standards/`, {
+          stdID,
+          stdName,
+        })
+        .then((response) => {
+          standards.push(response.data);
+        });
+    }
     handleClose();
   };
   useEffect(() => {
-    axios.get(`http://127.0.0.1:8000/standards/`).then((response) => {
-      setStandards(response.data);
-    });
+    if (!show) {
+      axios.get(`http://127.0.0.1:8000/standards/`).then((response) => {
+        setStandards(response.data);
+      });
+    }
   }, [show]);
 
   return (
@@ -87,7 +119,7 @@ const Classes = () => {
       <Header />
       <h3 className="mt-3 mb-2 mx-3 ms-5">List of all the Classes</h3>
       <Button
-        onClick={handleShow}
+        onClick={() => handleShow({})}
         variant="outline-primary"
         className="ms-5 mb-2 my-2"
       >
@@ -104,6 +136,7 @@ const Classes = () => {
               <Form.Control
                 onChange={(e) => setstdID(e.target.value)}
                 type="text"
+                defaultValue={stdID}
                 placeholder="Enter Standard ID"
               />
             </Form.Group>
@@ -112,6 +145,7 @@ const Classes = () => {
               <Form.Control
                 onChange={(e) => setstdName(e.target.value)}
                 type="text"
+                defaultValue={stdName}
                 placeholder="Enter Standard Name"
               />
             </Form.Group>
@@ -155,13 +189,17 @@ const Classes = () => {
                       show={modalShow}
                       onHide={() => setModalShow(false)}
                     />{" "}
-                    <Button variant="success" size="sm" onClick={handleShow}>
+                    <Button
+                      variant="success"
+                      size="sm"
+                      onClick={() => handleShow(standard)}
+                    >
                       Update
                     </Button>{" "}
                     <Button
                       variant="danger"
                       size="sm"
-                      onClick={() => alert("Delete this record?")}
+                      onClick={() => onDelete(standard.id)}
                     >
                       Delete
                     </Button>{" "}
